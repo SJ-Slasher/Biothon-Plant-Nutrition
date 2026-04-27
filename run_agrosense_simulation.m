@@ -215,23 +215,6 @@ for c = 1:nCrops
 end
 
 %% =========================================================================
-%  COST COMPARISON
-% =========================================================================
-cost_expensive = 350;   % USD: Full sensor suite with NPK sensor
-cost_lowcost   = 40;    % USD: pH + Moisture + Temp + Humidity + MCU
-cost_reduction = 100 * (cost_expensive - cost_lowcost) / cost_expensive;
-
-fprintf('\n');
-disp('=================================================================');
-disp('  COST COMPARISON');
-disp('=================================================================');
-fprintf('  Traditional system cost: $%d (with NPK sensor)\n', cost_expensive);
-fprintf('  AgroSense system cost:   $%d (AI-estimated NPK)\n', cost_lowcost);
-fprintf('  Cost Reduction:          %.1f%%\n', cost_reduction);
-fprintf('  Savings per unit:        $%d\n', cost_expensive - cost_lowcost);
-disp('=================================================================');
-
-%% =========================================================================
 %  PLOTS: Equivalent to Simulink Scope blocks
 % =========================================================================
 
@@ -285,20 +268,6 @@ title('Estimated N, P, K and Composite NPK Over Time');
 legend('Nitrogen (N)', 'Phosphorus (P)', 'Potassium (K)', 'Composite NPK', ...
     'Location', 'southeast');
 ylim([0, 110]);
-grid on;
-
-figure('Name','AgroSense - Cost Comparison', ...
-       'Position',[100,200,500,400], 'Color','white');
-bar_data = [cost_expensive; cost_lowcost];
-bar(bar_data, 'FaceColor', 'flat', ...
-    'CData', [0.9 0.3 0.3; 0.2 0.7 0.3]);
-set(gca, 'XTickLabel', {'Traditional System','AgroSense (AI NPK)'});
-ylabel('System Cost (USD)');
-title(sprintf('Cost Comparison - %.1f%% Reduction', cost_reduction));
-for i = 1:2
-    text(i, bar_data(i)+5, sprintf('$%d', bar_data(i)), ...
-        'HorizontalAlignment', 'center', 'FontWeight', 'bold');
-end
 grid on;
 
 disp('Plots generated. Simulation complete!');

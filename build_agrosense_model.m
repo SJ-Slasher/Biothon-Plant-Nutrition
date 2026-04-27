@@ -36,7 +36,7 @@ set_param(modelName, 'SolverType', 'Fixed-step');
 set_param(modelName, 'FixedStep', '0.1');
 set_param(modelName, 'Solver', 'FixedStepAuto');
 
-disp('[1/8] Creating Sensor Data Generation Subsystem...');
+disp('[1/7] Creating Sensor Data Generation Subsystem...');
 
 %% =========================================================================
 %  SUBSYSTEM 1: Sensor Data Generation
@@ -92,7 +92,7 @@ add_block('built-in/Outport', [sensorSys '/Humidity_Out'], ...
     'Port', '4', 'Position', [260, 420, 300, 440]);
 add_line(sensorSys, 'Humidity_Random/1', 'Humidity_Out/1');
 
-disp('[2/8] Creating Signal Filtering Subsystem...');
+disp('[2/7] Creating Signal Filtering Subsystem...');
 
 %% =========================================================================
 %  SUBSYSTEM 2: Signal Filtering
@@ -142,7 +142,7 @@ for i = 1:4
     add_line(filterSys, [s '_LPF/1'],   [s '_Out/1']);
 end
 
-disp('[3/8] Creating Soil Classification Subsystem...');
+disp('[3/7] Creating Soil Classification Subsystem...');
 
 %% =========================================================================
 %  SUBSYSTEM 3: Soil Condition Classification
@@ -181,7 +181,7 @@ add_line(classSys, 'Soil_Classifier/2', 'Moist_Class/1');
 add_line(classSys, 'Soil_Classifier/3', 'Temp_Class/1');
 add_line(classSys, 'Soil_Classifier/4', 'Humidity_Class/1');
 
-disp('[4/8] Creating AI Crop Recommendation Subsystem...');
+disp('[4/7] Creating AI Crop Recommendation Subsystem...');
 
 %% =========================================================================
 %  SUBSYSTEM 4: AI Crop Recommendation Engine
@@ -236,46 +236,7 @@ add_line(aiSys, 'Crop_AI_Engine/1', 'Crop_Score/1');
 add_line(aiSys, 'Crop_AI_Engine/2', 'Crop_Index/1');
 add_line(aiSys, 'Crop_AI_Engine/3', 'Advice_Code/1');
 
-disp('[5/8] Creating Cost Comparison Subsystem...');
-
-%% =========================================================================
-%  SUBSYSTEM 5: Cost Comparison
-% =========================================================================
-
-costSys = [modelName '/Cost_Comparison'];
-add_block('built-in/Subsystem', costSys, ...
-    'Position', [640, yBase+220, 820, yBase+360]);
-
-% Expensive system cost: NPK sensor ~$150 + pH $30 + others = ~$350
-add_block('simulink/Sources/Constant', [costSys '/Expensive_System'], ...
-    'Value', '350', 'Position', [30, 40, 120, 70]);
-
-% Low-cost system: pH $10 + moisture $8 + temp $5 + humidity $5 + MCU $12 = ~$40
-add_block('simulink/Sources/Constant', [costSys '/LowCost_System'], ...
-    'Value', '40', 'Position', [30, 120, 120, 150]);
-
-% Cost reduction: ((350-40)/350)*100 = 88.6%
-add_block('simulink/Math Operations/Add', [costSys '/Cost_Diff'], ...
-    'Inputs', '+-', 'Position', [170, 55, 210, 85]);
-add_block('simulink/Math Operations/Divide', [costSys '/Cost_Ratio'], ...
-    'Position', [260, 55, 310, 85]);
-add_block('simulink/Math Operations/Gain', [costSys '/To_Percent'], ...
-    'Gain', '100', 'Position', [360, 55, 420, 85]);
-
-add_block('built-in/Outport', [costSys '/Cost_Reduction_Pct'], ...
-    'Port', '1', 'Position', [470, 60, 510, 80]);
-add_block('built-in/Outport', [costSys '/LowCost_USD'], ...
-    'Port', '2', 'Position', [470, 130, 510, 150]);
-
-add_line(costSys, 'Expensive_System/1', 'Cost_Diff/1');
-add_line(costSys, 'LowCost_System/1',   'Cost_Diff/2');
-add_line(costSys, 'Cost_Diff/1',         'Cost_Ratio/1');
-add_line(costSys, 'Expensive_System/1',  'Cost_Ratio/2');
-add_line(costSys, 'Cost_Ratio/1',        'To_Percent/1');
-add_line(costSys, 'To_Percent/1',        'Cost_Reduction_Pct/1');
-add_line(costSys, 'LowCost_System/1',    'LowCost_USD/1');
-
-disp('[6/8] Adding Dashboard Display blocks...');
+disp('[5/7] Adding Dashboard Display blocks...');
 
 %% =========================================================================
 %  DASHBOARD DISPLAY BLOCKS
@@ -291,8 +252,7 @@ displayBlocks = { ...
     'Humidity_Display',    [dashX, 180, dashX+100, 210], 'Humidity (%)'; ...
     'CropScore_Display',   [dashX, 250, dashX+100, 280], 'Suitability Score'; ...
     'CropIndex_Display',   [dashX, 300, dashX+100, 330], 'Crop Index'; ...
-    'AdviceCode_Display',  [dashX, 350, dashX+100, 380], 'Advice Code'; ...
-    'CostSave_Display',    [dashX, 430, dashX+100, 460], 'Cost Saved (%)'; ...
+    'AdviceCode_Display',  [dashX, 350, dashX+100, 380], 'Advice Code' ...
 };
 
 for i = 1:size(displayBlocks, 1)
@@ -302,7 +262,7 @@ for i = 1:size(displayBlocks, 1)
         'Format', 'short');
 end
 
-disp('[7/8] Adding Scope blocks for raw vs filtered signals...');
+disp('[6/7] Adding Scope blocks for raw vs filtered signals...');
 
 %% =========================================================================
 %  SCOPE BLOCKS: Raw vs Filtered comparison
@@ -320,7 +280,7 @@ for i = 1:4
     % Note: connections to raw + filtered done after subsystems are wired
 end
 
-disp('[8/8] Wiring all top-level subsystems together...');
+disp('[7/7] Wiring all top-level subsystems together...');
 
 %% =========================================================================
 %  TOP-LEVEL WIRING
@@ -357,9 +317,6 @@ add_line(modelName, 'Signal_Filtering/1', 'pH_Display/1');
 add_line(modelName, 'Signal_Filtering/2', 'Moisture_Display/1');
 add_line(modelName, 'Signal_Filtering/3', 'Temp_Display/1');
 add_line(modelName, 'Signal_Filtering/4', 'Humidity_Display/1');
-
-% Cost -> Dashboard
-add_line(modelName, 'Cost_Comparison/1', 'CostSave_Display/1');
 
 % Scopes: raw sensor vs filtered
 add_line(modelName, 'Sensor_Data_Generation/1', 'pH_Scope/1');
